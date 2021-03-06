@@ -1,0 +1,74 @@
+ instala
+
+    django
+
+
+ se crea el proyecto.
+
+ se instala:
+
+    django-tenant-schemas
+
+En settings.py se configura lo siguiente ( base de datos ):
+
+    DATABASES = {
+    'default': {
+        'ENGINE': 'tenant_schemas.postgresql_backend',
+        'NAME': "name",
+        'USER': "user",
+        'PASSWORD': "password",
+        'HOST': "localhost",
+        'PORT': 5432,
+        'CHARSET': 'UTF8',
+    }
+}
+
+
+ALLOWED_HOSTS = ['*']
+
+
+en los middleware:
+    'tenant_schemas.middleware.TenantMiddleware',
+
+
+DATABASE_ROUTERS = (
+    'tenant_schemas.routers.TenantSyncRouter',
+)
+
+
+se crean 2 apps:
+
+    shared  ( app compartida por todos los clientes )
+
+    store   ( app tenant, es una app individual )
+
+de nuevo en settings.py se crean 2 copias de INSTALLED_APPS.
+
+una se llama SHARED_APPS, y la otra se llama TENANT_APPS;
+
+    en SHARED_APPS se agrega:  'shared',
+    en TENANT_APPS se agrega:  'store',
+    y en INSTALLED_APPS se agregan:   'tenant_schemas',  ; 'shared',   y 'store';
+
+En settings.py se configura lo siguiente:
+
+        TENANT_MODEL = 'shared.Client'
+
+
+Luego se crean los models para cada apps se realiza el makemigrations,
+
+
+
+
+se corre el comando
+
+    $ python manage.py migrate_schemas --
+
+
+Para crear superuser
+
+    $ python manage.py createsuperuser --username=admin --schema=public
+
+
+
+Fuente: https://www.youtube.com/watch?v=JLLHKNKVebk&t=659s
